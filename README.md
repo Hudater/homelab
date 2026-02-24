@@ -4,6 +4,9 @@ This repository contains the architectural documentation, system design decision
 
 It will document the architecture, rebuild process, and operational philosophy behind a fully automated, reproducible private infrastructure stack.
 
+[Blog Post!](https://blog.hudater.dev/posts/homelab/)
+![My Homelab](https://res.cloudinary.com/djsasyvfl/image/upload/v1767633860/Hudater_Homelab_v1.0_a2qotp.svg)
+
 > Reproducible, Infrastructure-as-Code driven private cloud built on Proxmox and Oracle Cloud
 
 Provisioning and configuration live in separate repositories.
@@ -21,8 +24,6 @@ This repository is the authoritative documentation and system reference.
 Separation ensures clean lifecycle boundaries between provisioning and configuration.
 
 ## System Overview
-
-[![My Homelab](https://res.cloudinary.com/djsasyvfl/image/upload/v1767633860/Hudater_Homelab_v1.0_a2qotp.svg)](https://blog.hudater.dev/posts/homelab/)
 
 The infra is built with strict separation of concerns:
 
