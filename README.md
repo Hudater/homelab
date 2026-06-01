@@ -1,5 +1,6 @@
 # Homelab
 
+[![Resume](https://img.shields.io/website?label=Resume&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fresume.hudater.dev%2F)](https://resume.hudater.dev/)
 [![Portfolio](https://img.shields.io/website?label=portfolio&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fhudater.dev%2F)](https://hudater.dev/)
 [![Infrastructure Status](https://img.shields.io/website?label=Infrastructure%20Status&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fstatus.hudater.dev%2F)](https://status.hudater.dev/)
 [![Links](https://img.shields.io/website?label=Links&color=4051B5&style=for-the-badge&url=https%3A%2F%2Flinks.hudater.dev%2F)](https://links.hudater.dev/)
@@ -16,10 +17,10 @@
 
 Three regions connected over a NetBird WireGuard mesh. No self-hosted service is publicly reachable. All access goes through Traefik with Authentik forward authentication.
 
-| Region | Role |
-|---|---|
-| OCI Mumbai | Primary cloud region |
-| OCI Zurich | Secondary cloud region, DR and future CDN candidate |
+| Region            | Role                                                |
+| ----------------- | --------------------------------------------------- |
+| OCI Mumbai        | Primary cloud region                                |
+| OCI Zurich        | Secondary cloud region, DR and future CDN candidate |
 | On-premises Noida | Primary compute, Proxmox hypervisor and k3s cluster |
 
 The on-premises site runs two environments: **prod** (stable) and **staging** (testing), separated by VLANs. OPNsense handles firewall and inter-VLAN routing.
@@ -39,34 +40,34 @@ The on-premises site runs two environments: **prod** (stable) and **staging** (t
 
 ## Tech Stack
 
-| Layer | Tech |
-|---|---|
-| Hypervisor | Proxmox VE |
-| Firewall / Routing | OPNsense |
-| Cloud | Oracle Cloud Infrastructure (Mumbai + Zurich) |
-| Container Orchestration | k3s, 3 control plane + 3 worker nodes, on-prem |
-| Provisioning | OpenTofu + Terragrunt, remote state on HCP |
-| Overlay Networking | NetBird, WireGuard-based mesh |
-| Reverse Proxy | Traefik |
-| Identity | Authentik, Google OAuth + Proxy Outpost for forward auth |
-| DNS | Technitium, clustered |
-| Monitoring | Loki, Grafana, Prometheus, Alloy |
-| Services | Docker Compose, k3s migration ongoing |
-| Domain Management | Cloudflare, IaC managed |
+| Layer                      | Tech                                                     |
+| -------------------------- | -------------------------------------------------------- |
+| Hypervisor                 | Proxmox VE                                               |
+| Firewall / Routing         | OPNsense                                                 |
+| Cloud                      | Oracle Cloud Infrastructure (Mumbai + Zurich)            |
+| Container Orchestration    | k3s, 3 control plane + 3 worker nodes, on-prem           |
+| Provisioning               | OpenTofu + Terragrunt, remote state on HCP               |
+| Overlay Networking         | NetBird, WireGuard-based mesh                            |
+| Reverse Proxy              | Traefik                                                  |
+| Identity                   | Authentik, Google OAuth + Proxy Outpost for forward auth |
+| DNS                        | Technitium, clustered                                    |
+| Monitoring & Observability | Loki, Grafana, Prometheus, Alloy                         |
+| Services                   | Docker Compose, k3s migration ongoing                    |
+| Domain Management          | Cloudflare, IaC managed                                  |
 
 ---
 
 ## IaC Coverage
 
-| Component | Tooling | State | CI |
-|---|---|---|---|
-| OCI Mumbai | OpenTofu + Terragrunt | HCP | GitHub Actions |
-| OCI Zurich | OpenTofu + Terragrunt | HCP | GitHub Actions |
-| Cloudflare DNS | OpenTofu | HCP | GitHub Actions |
-| Resume pipeline | Cloudflare Workers + KV | HCP | GitHub Actions |
-| k3s cluster | OpenTofu + Ansible | HCP | None, ArgoCD planned |
-| Core services (Authentik, NetBird, Technitium) | OpenTofu | HCP | None |
-| Docker Compose stacks | Git-tracked | — | None |
+| Component                                      | Tooling                 | State | CI                   |
+| ---------------------------------------------- | ----------------------- | ----- | -------------------- |
+| OCI Mumbai                                     | OpenTofu + Terragrunt   | HCP   | GitHub Actions       |
+| OCI Zurich                                     | OpenTofu + Terragrunt   | HCP   | GitHub Actions       |
+| Cloudflare DNS                                 | OpenTofu                | HCP   | GitHub Actions       |
+| Resume pipeline                                | Cloudflare Workers + KV | HCP   | GitHub Actions       |
+| k3s cluster                                    | OpenTofu + Ansible      | HCP   | None, ArgoCD planned |
+| Core services (Authentik, NetBird, Technitium) | OpenTofu                | HCP   | None                 |
+| Docker Compose stacks                          | Git-tracked             | —     | None                 |
 
 ---
 
@@ -88,13 +89,13 @@ The on-premises site runs two environments: **prod** (stable) and **staging** (t
 
 Follows separation of concerns: `infrastructure-iac` for infrastructure, `infrastructure-services` for services.
 
-| Repository | Status | Responsibility |
-|---|---|---|
-| [infrastructure-iac](https://github.com/Hudater/infrastructure-iac) | Active | OpenTofu IaC for OCI regions, k3s cluster, and core services |
-| [infrastructure-services](https://github.com/Hudater/infrastructure-services) | Active | Docker Compose stacks and service manifests |
-| [infrastructure-ansible](https://github.com/Hudater/ansible_lab) | WIP, private | Configuration management, post-IaC stabilization |
-| [resume-pipeline](https://github.com/Hudater/resume-pipeline) | Active | Cloudflare Workers + KV pipeline for resume.hudater.dev |
-| [archive-docs](https://github.com/Hudater/archive-docs) | Archived | Historical docs, live at [archive-docs.hudater.dev](https://archive-docs.hudater.dev/) |
+| Repository                                                                    | Status       | Responsibility                                                                         |
+| ----------------------------------------------------------------------------- | ------------ | -------------------------------------------------------------------------------------- |
+| [infrastructure-iac](https://github.com/Hudater/infrastructure-iac)           | Active       | OpenTofu IaC for OCI regions, k3s cluster, and core services                           |
+| [infrastructure-services](https://github.com/Hudater/infrastructure-services) | Active       | Docker Compose stacks and service manifests                                            |
+| [infrastructure-ansible](https://github.com/Hudater/ansible_lab)              | WIP, private | Configuration management, post-IaC stabilization                                       |
+| [resume-pipeline](https://github.com/Hudater/resume-pipeline)                 | Active       | Cloudflare Workers + KV pipeline for resume.hudater.dev                                |
+| [archive-docs](https://github.com/Hudater/archive-docs)                       | Archived     | Historical docs, live at [archive-docs.hudater.dev](https://archive-docs.hudater.dev/) |
 
 ---
 
