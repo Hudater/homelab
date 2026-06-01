@@ -1,50 +1,103 @@
-# Overview
+# Homelab
 
-[![Portfolio status](https://img.shields.io/website?label=portfolio&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fhudater.dev%2F)](https://hudater.dev/)
-[![Live Infrastrucute Status](https://img.shields.io/website?label=Live%20Infrastructure%20Status&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fhudater.dev%2F)](https://status.hudater.dev/)
-[![Linkme](https://img.shields.io/website?label=Linkme&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fhudater.dev%2F)](https://links.hudater.dev/)
+[![Portfolio](https://img.shields.io/website?label=portfolio&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fhudater.dev%2F)](https://hudater.dev/)
+[![Infrastructure Status](https://img.shields.io/website?label=Infrastructure%20Status&color=4051B5&style=for-the-badge&url=https%3A%2F%2Fstatus.hudater.dev%2F)](https://status.hudater.dev/)
+[![Links](https://img.shields.io/website?label=Links&color=4051B5&style=for-the-badge&url=https%3A%2F%2Flinks.hudater.dev%2F)](https://links.hudater.dev/)
 
-This repository contains the architectural documentation, system design decisions, and operational runbooks for my homelab infrastructure.
+> Everything-as-Code private cloud. 2 OCI regions + on-premises Proxmox. Zero-trust access, identity-driven authorization.
 
-It will document the architecture, rebuild process, and operational philosophy behind a fully automated, reproducible private infrastructure stack.
+[![Blog](https://img.shields.io/badge/Read%20My-Blog-4051B5?style=for-the-badge&color=c63e3e)](https://blog.hudater.dev/categories/homelab/)
 
-[![Blog](https://img.shields.io/badge/Read%20My-Blog-4051B5?style=for-the-badge&color=c63e3e)](https://blog.hudater.dev/posts/homelab/)
-![My Homelab](https://res.cloudinary.com/djsasyvfl/image/upload/v1767633860/Hudater_Homelab_v1.0_a2qotp.svg)
+![Homelab Architecture](https://res.cloudinary.com/djsasyvfl/image/upload/v1767633860/Hudater_Homelab_v1.0_a2qotp.svg)
 
-> Reproducible, Infrastructure-as-Code driven private cloud built on Proxmox and Oracle Cloud
+---
 
-Provisioning and configuration live in separate repositories.
-This repository is the authoritative documentation and system reference.
+## Architecture
 
-## Related Repositories
+Three regions connected over a NetBird WireGuard mesh. No self-hosted service is publicly reachable. All access goes through Traefik with Authentik forward authentication.
 
-| Repository                                                  | Responsibility                    |
-| ----------------------------------------------------------- | --------------------------------- |
-| [Infra Lab (OCI WIP)](https://github.com/Hudater/infra_lab) | Infrastructure Provisioning       |
-| [Ansible Lab (WIP)](https://github.com/Hudater/ansible_lab) | Configuration Management          |
-| [Services](https://github.com/Hudater/services)             | Docker Compose Stacks and Scripts |
-| [Archive Docs](https://github.com/Hudater/archive-docs)     | Currently Archived Docs for lab   |
+| Region | Role |
+|---|---|
+| OCI Mumbai | Primary cloud region |
+| OCI Zurich | Secondary cloud region, DR and future CDN candidate |
+| On-premises Noida | Primary compute, Proxmox hypervisor and k3s cluster |
 
-Separation ensures clean lifecycle boundaries between provisioning and configuration.
+The on-premises site runs two environments: **prod** (stable) and **staging** (testing), separated by VLANs. OPNsense handles firewall and inter-VLAN routing.
 
-## System Overview
+[Full architecture writeup](https://blog.hudater.dev/categories/homelab/)
 
-The infra is built with strict separation of concerns:
+---
 
-| Layer         | Tech                              |
-| ------------- | --------------------------------- |
-| Hypervisor    | Proxmox                           |
-| Cloud         | Oracle Cloud                      |
-| Provisioning  | OpenTofu                          |
-| Configuration | Ansible                           |
-| Core Services | Firewall, DNS, overlay networking |
+## Design Principles
 
-Repository Purpose:
+- **Everything-as-Code**: Infrastructure, DNS, identity, cluster config, and service definitions are managed via OpenTofu. No manual provisioning.
+- **Zero-trust access**: NetBird overlay + Traefik + Authentik Proxy Outpost. Nothing is reachable without passing auth.
+- **Identity-first**: Users sign in via Google OAuth through Authentik. A custom enrollment flow assigns group membership at sign-in time. JWT sync propagates groups to all services automatically. Humans and servers are managed as separate groups.
+- **Incremental k8s migration**: Core services run on Docker Compose today. Stateless workloads will move to the on-prem k3s cluster under ArgoCD.
 
-- Architecture documentation
-- Network topology explanations
-- DNS flow documentation
-- Disaster recovery procedures
-- Design rationale
-- Rebuild instructions
-- System diagrams
+---
+
+## Tech Stack
+
+| Layer | Tech |
+|---|---|
+| Hypervisor | Proxmox VE |
+| Firewall / Routing | OPNsense |
+| Cloud | Oracle Cloud Infrastructure (Mumbai + Zurich) |
+| Container Orchestration | k3s, 3 control plane + 3 worker nodes, on-prem |
+| Provisioning | OpenTofu + Terragrunt, remote state on HCP |
+| Overlay Networking | NetBird, WireGuard-based mesh |
+| Reverse Proxy | Traefik |
+| Identity | Authentik, Google OAuth + Proxy Outpost for forward auth |
+| DNS | Technitium, clustered |
+| Monitoring | Loki, Grafana, Prometheus, Alloy |
+| Services | Docker Compose, k3s migration ongoing |
+| Domain Management | Cloudflare, IaC managed |
+
+---
+
+## IaC Coverage
+
+| Component | Tooling | State | CI |
+|---|---|---|---|
+| OCI Mumbai | OpenTofu + Terragrunt | HCP | GitHub Actions |
+| OCI Zurich | OpenTofu + Terragrunt | HCP | GitHub Actions |
+| Cloudflare DNS | OpenTofu | HCP | GitHub Actions |
+| Resume pipeline | Cloudflare Workers + KV | HCP | GitHub Actions |
+| k3s cluster | OpenTofu + Ansible | HCP | None, ArgoCD planned |
+| Core services (Authentik, NetBird, Technitium) | OpenTofu | HCP | None |
+| Docker Compose stacks | Git-tracked | — | None |
+
+---
+
+## Services
+
+**Zero-trust stack**: NetBird + Traefik + Authentik. All services sit behind this.
+
+**Self-hosted AI**: Ollama + Open WebUI, running on AMD RX 7600 GPU. Docker MCP Gateway integration planned.
+
+**Utilities**: IT-Tools, Stirling PDF, Portainer & much more
+
+**Monitoring & Observability**: Loki, Grafana, Prometheus, Alloy. Setup in progress.
+
+**WIP**: Forgejo at [git.hudater.dev](https://git.hudater.dev)
+
+---
+
+## Repositories
+
+Follows separation of concerns: `infrastructure-iac` for infrastructure, `infrastructure-services` for services.
+
+| Repository | Status | Responsibility |
+|---|---|---|
+| [infrastructure-iac](https://github.com/Hudater/infrastructure-iac) | Active | OpenTofu IaC for OCI regions, k3s cluster, and core services |
+| [infrastructure-services](https://github.com/Hudater/infrastructure-services) | Active | Docker Compose stacks and service manifests |
+| [infrastructure-ansible](https://github.com/Hudater/ansible_lab) | WIP, private | Configuration management, post-IaC stabilization |
+| [resume-pipeline](https://github.com/Hudater/resume-pipeline) | Active | Cloudflare Workers + KV pipeline for resume.hudater.dev |
+| [archive-docs](https://github.com/Hudater/archive-docs) | Archived | Historical docs, live at [archive-docs.hudater.dev](https://archive-docs.hudater.dev/) |
+
+---
+
+## Contact
+
+[harshit@hudater.dev](mailto:harshit@hudater.dev)
