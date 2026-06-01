@@ -1,0 +1,56 @@
+name: Update Submodules
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    paths:
+      - ".github/**"
+
+env:
+  SUBMODULE_URLS: |
+    https://github.com/Hudater/infrastructure-iac
+    https://github.com/Hudater/infrastructure-services
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update submodules
+        run: |
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            url=$(echo "$url" | xargs)
+            name=$(basename "$url" .git)
+            echo "Processing: $name ($url)"
+
+            if [ -d "$name" ]; then
+              echo "Submodule exists, updating..."
+              git submodule update --remote "$name"
+            else
+              echo "Adding new submodule..."
+              git submodule add "$url" "$name"
+            fi
+          done <<< "$SUBMODULE_URLS"
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update submodules [skip ci]"
+            git push
+          fi
