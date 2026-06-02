@@ -6,7 +6,8 @@
 [![Links](https://img.shields.io/website?label=Links&color=4051B5&style=for-the-badge&url=https%3A%2F%2Flinks.hudater.dev%2F)](https://links.hudater.dev/)
 
 > Everything-as-Code private cloud. 2 OCI regions + on-premises Proxmox. Zero-trust access, identity-driven authorization.
-
+>
+> k3s, OpenTofu, NetBird, Authentik, Traefik, OCI, Proxmox, Grafana, Loki, Prometheus
 [![Blog](https://img.shields.io/badge/Read%20My-Blog-4051B5?style=for-the-badge&color=c63e3e)](https://blog.hudater.dev/categories/homelab/)
 
 ![Homelab Architecture](https://res.cloudinary.com/djsasyvfl/image/upload/v1767633860/Hudater_Homelab_v1.0_a2qotp.svg)
